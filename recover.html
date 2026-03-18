@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FinanceOS Data Recovery</title>
+<style>
+  body{background:#0d1117;color:#e2e8f0;font-family:sans-serif;padding:24px;max-width:480px;margin:0 auto}
+  h2{color:#6366f1;margin-bottom:8px}
+  .card{background:#1e293b;border-radius:12px;padding:16px;margin:16px 0}
+  .item{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #334155;font-size:14px}
+  .item:last-child{border:none}
+  .label{color:#94a3b8}
+  .val{color:#4ade80;font-weight:700}
+  .btn{width:100%;padding:16px;border-radius:12px;border:none;font-size:16px;font-weight:800;cursor:pointer;margin-top:8px}
+  .btn-go{background:#6366f1;color:#fff}
+  .btn-cancel{background:#1e293b;color:#94a3b8;border:1px solid #334155}
+  .warn{background:#450a0a;border:1px solid #f87171;border-radius:10px;padding:12px;font-size:13px;color:#fca5a5;margin-bottom:16px}
+  .step{font-size:12px;color:#64748b;margin-top:4px}
+</style>
+</head>
+<body>
+<h2>🔧 FinanceOS Data Recovery</h2>
+<p style="color:#94a3b8;font-size:13px">This tool restores your March 13 backup data into the app.</p>
+
+<div class="warn">⚠️ This will overwrite any current data in the app. Only proceed if your app is showing empty data.</div>
+
+<div class="card">
+  <div style="font-size:12px;color:#64748b;font-weight:700;margin-bottom:8px">DATA TO BE RESTORED</div>
+  <div class="item"><span class="label">💰 Loans</span><span class="val">3 (Kredbee, Fibe, Mobik)</span></div>
+  <div class="item"><span class="label">💳 Credit Cards</span><span class="val">1 (SBI ••4532)</span></div>
+  <div class="item"><span class="label">🧾 Expenses</span><span class="val">4 items (Mar 2026)</span></div>
+  <div class="item"><span class="label">💸 Income</span><span class="val">₹1,20,000 (Feb Salary)</span></div>
+  <div class="item"><span class="label">📅 Date</span><span class="val">March 12-13, 2026</span></div>
+</div>
+
+<div id="status" style="display:none" class="card">
+  <div id="status-text" style="text-align:center;font-size:15px;font-weight:700"></div>
+</div>
+
+<button class="btn btn-go" onclick="doRecover()">✅ Restore My Data</button>
+<button class="btn btn-cancel" onclick="window.close()">Cancel</button>
+
+<p class="step">After restoring: open your FinanceOS app, login — data will appear and auto-sync to cloud.</p>
+
+<script>
+var RECOVERED_DATA = {"loans":[{"id":1773340510008,"name":"Kredbee","amt":300000,"rate":24,"ten":36,"paid":30,"emi":11770,"dueDay":8,"currMonthPaid":true,"currMonthKey":"2026-03"},{"id":1773360631506,"name":"Fibe","amt":108000,"rate":27,"ten":12,"paid":8,"emi":10370,"dueDay":6,"currMonthPaid":true,"currMonthKey":"2026-03"},{"id":1773360832199,"name":"Mobik","amt":167889,"rate":29.99,"ten":18,"paid":9,"emi":11696,"dueDay":5,"currMonthPaid":true,"currMonthKey":"2026-03"}],"cards":[{"id":1773360527037,"bank":"SBI","last4":"4532","bal":36000,"dueDay":11,"currMonthPaid":true,"currMonthKey":"2026-03"}],"expenses":{"2026-03":[{"id":1773360685440,"name":"Car Byk Wash","amt":500,"cat":"Other"},{"id":1773360695735,"name":"Cook","amt":3500,"cat":"Other"},{"id":1773360716408,"name":"Village Expenses","amt":7000,"cat":"Other"},{"id":1773360731072,"name":"Electricity","amt":2500,"cat":"Electricity"}]},"incomes":{"2026-03":[{"id":"1773340403142","src":"Salary","amt":120000,"note":"Feb Salary","date":"2026-03-12"}]},"goals":[]};
+
+function doRecover(){
+  try {
+    // Get current logged in user
+    var userStr = localStorage.getItem('fOs_u');
+    if(!userStr){ showStatus('❌ Not logged in! Please open FinanceOS, login first, then come back here.', '#f87171'); return; }
+    var user = JSON.parse(userStr);
+    var uid = user.id;
+
+    // Restore data under user's keys
+    localStorage.setItem('fOs_l_'+uid, JSON.stringify(RECOVERED_DATA.loans));
+    localStorage.setItem('fOs_c_'+uid, JSON.stringify(RECOVERED_DATA.cards));
+    localStorage.setItem('fOs_e_'+uid, JSON.stringify(RECOVERED_DATA.expenses));
+    localStorage.setItem('fOs_i_'+uid, JSON.stringify(RECOVERED_DATA.incomes));
+    localStorage.setItem('fOs_g_'+uid, JSON.stringify(RECOVERED_DATA.goals));
+    // Clear last sync so app pulls from cloud properly
+    localStorage.removeItem('fOs_last_sync');
+
+    showStatus('✅ Data restored! Now open FinanceOS — your loans, cards and expenses will appear.', '#4ade80');
+  } catch(e) {
+    showStatus('❌ Error: ' + e.message, '#f87171');
+  }
+}
+
+function showStatus(msg, color){
+  var s = document.getElementById('status');
+  var t = document.getElementById('status-text');
+  s.style.display = 'block';
+  t.style.color = color;
+  t.textContent = msg;
+}
+</script>
+</body>
+</html>
